@@ -25,7 +25,11 @@ def validate_request_and_get_data_frame(request_data: bytes) -> pd.DataFrame:
                 income_request.IncomeRequest.from_dict(item)
         else:
             income_request.IncomeRequest.from_dict(request_json)
-        return pd.DataFrame(request_json)
+        return (
+            pd.DataFrame(request_json)
+            if isinstance(request_json, list)
+            else pd.DataFrame([request_json])
+        )
     except Exception as e:
         raise ValueError(f"An unexpected error occurred: {e}")
 
