@@ -1,0 +1,113 @@
+openapi: 3.0.1
+
+info:
+  title: income api
+  description: |
+    Test API for mock income prediction model.
+  version: 1.0.0
+  contact:
+    name: test
+
+servers:
+  - url: http://localhost:7000
+    description: Local server
+
+tags:
+  - name: income
+    description: Operations related to income prediction.
+
+paths:
+  /income:
+    post:
+      operationId: post-income-prediction
+      tags:
+        - income
+      description: Endpoint to predict yearly income based on customer data.
+      parameters:
+        - $ref: "#/components/parameters/RequestId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IncomeRequest"
+      responses:
+        "200":
+          description: Successful response with predicted income.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/responses/IncomeResponse_200"
+
+components:
+  schemas:
+    IncomeRequest:
+      type: object
+      properties:
+        customer_id:
+          type: string
+          description: Unique identifier for the customer.
+          pattern: "^[0-9]{11}$"
+          example: "01010199999"
+          minLength: 11
+          maxLength: 11
+        period:
+          type: string
+          description: Period in YYYYMM format.
+          pattern: "[0-9]{6}"
+          example: "202301"
+        age:
+          type: integer
+          description: Age of the customer.
+          minimum: 0
+          example: 30
+        employment_status:
+          type: string
+          description: Employment status of the customer.
+          example: "employed"
+          enum:
+            - employed
+            - unemployed
+            - student
+        income_month:
+          type: number
+          format: float
+          description: Monthly income of the customer.
+          example: 4000.50
+          minimum: 0.0
+      required:
+        - customer_id
+        - period
+        - age
+        - employment_status
+        - income_month
+    IncomeResponse:
+      type: object
+      properties:
+        predicted_yearly_income:
+          type: number
+          format: float
+          description: Predicted yearly income of the customer.
+          example: 48000.75
+          minimum: 0.0
+      required:
+        - predicted_yearly_income
+  parameters:
+    RequestId:
+      name: RequestId
+      in: header
+      description: Unique request identifier
+      required: false
+      schema:
+        type: string
+        format: uuid
+  responses:
+    IncomeResponse_200:
+      description: Successful response with predicted income.
+      headers:
+        RequestId:
+          $ref: "#/components/parameters/RequestId"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/IncomeResponse"

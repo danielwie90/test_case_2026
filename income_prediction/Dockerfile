@@ -2,7 +2,7 @@ FROM ubuntu:22.04 AS prod-image
 
 WORKDIR /src
 
-COPY requirements.txt ./
+COPY income_api_client-1.0.0-py3-none-any.whl requirements.txt ./
 RUN apt-get -y update && \
     apt-get -y install python3.10 python3-pip && \
     apt-get clean && \

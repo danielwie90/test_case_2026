@@ -1,1 +1,2 @@
 -r income_prediction/requirements.txt
+income_prediction/income_api_client-1.0.0-py3-none-any.whl

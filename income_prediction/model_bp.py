@@ -17,9 +17,9 @@ def run_income_prediction():
     }, ...]
     """
 
-    request_json = hf.validate_request_and_get_json_format(request_data=request.data)
+    request_df = hf.validate_request_and_get_data_frame(request_data=request.data)
 
-    predicted_yearly_income = hf.predict_income(request_json=request_json)
+    predicted_yearly_income = hf.predict_income(request_df=request_df)
     return Response(
         json.dumps({"predicted_yearly_income": predicted_yearly_income}),
         status=200,

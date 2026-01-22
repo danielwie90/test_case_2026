@@ -1,13 +1,12 @@
-import re
 import json
-from typing import Union
+from income_api_client.models import income_request
 
 import pandas as pd
 
 
-def validate_request_and_get_json_format(request_data: bytes) -> dict:
+def validate_request_and_get_data_frame(request_data: bytes) -> pd.DataFrame:
     """
-    Function to validate the incoming request data and return it as a json.
+    Function to validate the incoming request data and return it as a dataframe.
 
     Parameters:
     ----------
@@ -16,62 +15,22 @@ def validate_request_and_get_json_format(request_data: bytes) -> dict:
 
     Returns:
     -------
-    dict
-        The json format of the request.
+    pd.DataFrame
+        Dataframe representation of the request data.
     """
     try:
         request_json = json.loads(request_data)
-        if not {
-            "customer_id",
-            "period",
-            "income_month",
-            "age",
-            "employment_status",
-        }.issubset(request_json.keys()):
-            raise ValueError("Missing required keys in the request data.")
-        for key, value in request_json.items():
-            _validate_key_in_dictionary(key=key, value=value)
+        if isinstance(request_json, list):
+            for item in request_json:
+                income_request.IncomeRequest.from_dict(item)
+        else:
+            income_request.IncomeRequest.from_dict(request_json)
+        return pd.DataFrame(request_json)
     except Exception as e:
         raise ValueError(f"An unexpected error occurred: {e}")
-    return request_json
 
 
-def _validate_key_in_dictionary(
-    key: str,
-    value: Union[str, float, int],
-) -> None:
-    """
-    Function to validate if a key is present in a dictionary.
-
-    Parameters:
-    ----------
-    key : str
-        The key to look for.
-    value : Union[str, float, int]
-        The value associated with the key.
-
-    Raises:
-    ------
-    ValueError
-        If the key is not present in the dictionary.
-    """
-    if key == "customer_id":
-        if not isinstance(value, str) or len(value) != 11:
-            raise ValueError(f"Invalid length for '{key}'. Expected length 11.")
-    if key == "period":
-        if not isinstance(value, str) or not re.match(r"\d{6}", value):
-            raise ValueError(f"Invalid format for '{key}'. Expected format 6 digits.")
-    if key == "employment_status":
-        if value not in ["employed", "unemployed", "student"]:
-            raise ValueError(
-                f"Invalid value for '{key}'. Expected one of ['employed', 'unemployed', 'self-employed', 'student']."
-            )
-    if key == "income_month":
-        if not isinstance(value, float) or value < 0:
-            raise ValueError(f"Invalid value for '{key}'. Must be non-negative.")
-
-
-def predict_income(request_json: dict) -> float:
+def predict_income(request_df: pd.DataFrame) -> float:
     """
     Function to predict yearly income based on monthly income.
 
@@ -85,9 +44,6 @@ def predict_income(request_json: dict) -> float:
     float
         The predicted yearly income.
     """
-    if isinstance(request_json, dict):
-        request_json = [request_json]
-    request_df = pd.DataFrame(request_json)
     request_df.sort_values(by="period", inplace=True, ascending=False)
     request_df_year = request_df.head(12)
     max_age = request_df_year["age"].max()
