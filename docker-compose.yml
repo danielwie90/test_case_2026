@@ -1,0 +1,11 @@
+services:
+  income-api:
+    build:
+      context: ./income_prediction
+      dockerfile: Dockerfile
+      target: prod-image
+    container_name: income-api
+    expose:
+      - "7000"
+    ports:
+      - "7000:7000"
