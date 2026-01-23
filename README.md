@@ -21,7 +21,7 @@ Dette er en mock database som inneholder data som skal brukes som input til `inc
 Denne inneholder en tabell `input.customer_information` med følgende struktur:
 
 | Kolonne | Data Type | Beskrivelse |
-|-------------|-----------|-------------|-------------|
+|-------------|-----------|-------------|
 | `id` | INT | Unik id for hver rad med automatisk øking ved insertion |
 | `customer_id` | NVARCHAR(11) | Kundenummer (fødselsnummer)  |
 | `period` | NVARCHAR(6) | En månedsperiode representert på formatet YYYYMM |
