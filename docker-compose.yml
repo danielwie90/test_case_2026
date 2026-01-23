@@ -9,3 +9,15 @@ services:
       - "7000"
     ports:
       - "7000:7000"
+  database:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+      target: prod-image
+    container_name: database
+    environment:
+      SA_PASSWORD: "Password@123"
+    expose:
+      - "1433"
+    ports:
+      - "1433:1433"
